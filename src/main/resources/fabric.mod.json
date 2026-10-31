@@ -1,1 +1,19 @@
-
+{
+  "schemaVersion": 1,
+  "id": "masq",
+  "version": "${version}",
+  "name": "MasQ Client",
+  "description": "MasQ Client: animasyon odaklı modern client iskeleti.",
+  "authors": ["MasQ"],
+  "license": "All-Rights-Reserved",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.masq.MasQClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.1",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

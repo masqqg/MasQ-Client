@@ -1,1 +1,15 @@
-
+{
+  "key.masq.gui": "Open MasQ GUI",
+  "key.category.masq.main": "MasQ",
+  "key.masq.mod.hud": "Toggle Hud",
+  "key.masq.mod.sprint": "Toggle Sprint",
+  "key.masq.mod.flight": "Toggle Flight",
+  "key.masq.mod.speed": "Toggle Speed",
+  "key.masq.mod.autowalk": "Toggle AutoWalk",
+  "key.masq.mod.killaura": "Toggle KillAura",
+  "key.masq.mod.fullbright": "Toggle Fullbright",
+  "key.masq.mod.esp": "Toggle ESP",
+  "key.masq.mod.antiafk": "Toggle AntiAFK",
+  "key.masq.mod.chunkhunter": "Toggle ChunkHunter",
+  "key.masq.mod.clearrender": "Toggle ClearRender"
+}

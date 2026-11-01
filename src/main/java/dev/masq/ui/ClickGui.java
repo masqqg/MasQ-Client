@@ -1,3 +1,4 @@
+// PATH: src/main/java/dev/masq/ui/ClickGui.java
 package dev.masq.ui;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -132,11 +133,11 @@ public final class ClickGui extends Screen {
 			ex.tick();
 			m.fill.tick();
 			float e = Easing.clamp01(ex.value());
-			float h = RH + e * ((m.settings().size() + 1) * SR + 8);
+			float h = RH + e * ((m.visible().size() + 1) * SR + 8);
 			rows.add(new Row(m, y, h));
 			y += h + RG;
 			if (e > 0.01f) {
-				for (Setting<?> s : m.settings()) {
+				for (Setting<?> s : m.visible()) {
 					Spring a = anim(s);
 					a.set(target(s));
 					a.tick();
@@ -154,11 +155,6 @@ public final class ClickGui extends Screen {
 			boolean hit = o > 0.9f && my >= top() && my <= top() + areaH() && inside(mx, my, px() + 16, r.y, W - 32, RH);
 			hv.set(hit ? 1f : 0f);
 			hv.tick();
-		}
-
-		if (dragging != null) {
-			if (!this.minecraft.mouseHandler.isLeftPressed()) dragging = null;
-			else dragging.setFrac((mx - dragX) / dragW);
 		}
 
 		if (closing && open.value() < 0.03f) {
@@ -258,7 +254,7 @@ public final class ClickGui extends Screen {
 			c(Colors.a(m.enabled() ? Colors.TEXT : Colors.DIM, t)), false);
 
 		if (e <= 0.05f) return;
-		List<Setting<?>> ss = m.settings();
+		List<Setting<?>> ss = m.visible();
 		float sx = rx + 16, sw = rw - 32, a = t * e;
 		for (int j = 0; j <= ss.size(); j++) {
 			float sy = ry + RH + 4 + j * SR;
@@ -333,7 +329,7 @@ public final class ClickGui extends Screen {
 				return true;
 			}
 			if (btn != 0 || !expanded.contains(m) || exp(m).value() < 0.5f) continue;
-			List<Setting<?>> ss = m.settings();
+			List<Setting<?>> ss = m.visible();
 			for (int j = 0; j <= ss.size(); j++) {
 				if (!inside(x, y, rx + 16, r.y + RH + 4 + j * SR, rw - 32, SR)) continue;
 				if (j == ss.size()) {
@@ -358,6 +354,21 @@ public final class ClickGui extends Screen {
 			}
 		}
 		return super.mouseClicked(e, doubleClick);
+	}
+
+	@Override
+	public boolean mouseDragged(MouseButtonEvent e, double dx, double dy) {
+		if (dragging != null) {
+			dragging.setFrac((float) ((e.x() - dragX) / dragW));
+			return true;
+		}
+		return super.mouseDragged(e, dx, dy);
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent e) {
+		dragging = null;
+		return super.mouseReleased(e);
 	}
 
 	@Override

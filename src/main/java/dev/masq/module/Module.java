@@ -53,6 +53,11 @@ public abstract class Module {
 		var p = net.minecraft.client.Minecraft.getInstance().player;
 		if (p != null) p.displayClientMessage(net.minecraft.network.chat.Component.literal("\u00a7d[MasQ] \u00a7f" + String.format(fmt, args)), false);
 	}
+	/** HUD şeridinde gösterilen küçük etiket (ilk Mode ayarı). */
+	public String tag() {
+		for (Setting<?> s : settings) if (s instanceof Setting.Mode m) return m.get();
+		return "";
+	}
 	public boolean enabled() { return on; }
 	public String name() { return name; }
 	public String desc() { return desc; }

@@ -18,6 +18,8 @@ public final class Modules {
 		ModuleManager.register(new Fullbright());
 		ModuleManager.register(new Esp());
 		ModuleManager.register(new AntiAfk());
+		ModuleManager.register(new Freecam());
+		ModuleManager.register(new FreeLook());
 		ModuleManager.register(new ChunkHunter());   // ClearRender'dan önce: önce tespit
 		ModuleManager.register(new ClearRender());
 		hud.set(true);

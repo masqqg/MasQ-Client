@@ -1,152 +1,81 @@
-
+// PATH: src/main/java/dev/masq/module/Setting.java
 package dev.masq.module;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-
 public abstract class Setting<T> {
-    private final String name;
-    private BooleanSupplier visibility = () -> true;
+	private final String name;
+	protected T value;
 
-    protected Setting(String name) {
-        this.name = name;
-    }
+	protected Setting(String name, T def) {
+		this.name = name;
+		this.value = def;
+	}
 
-    public String name() {
-        return name;
-    }
+	private java.util.function.BooleanSupplier vis = () -> true;
 
-    public void showIf(BooleanSupplier condition) {
-        visibility = condition != null ? condition : () -> true;
-    }
+	/** Bu ayar sadece koşul doğruyken GUI'de görünür. */
+	public Setting<T> showIf(java.util.function.BooleanSupplier c) {
+		vis = c;
+		return this;
+	}
 
-    public boolean visible() {
-        return visibility.getAsBoolean();
-    }
+	public boolean visible() { return vis.getAsBoolean(); }
+	public String name() { return name; }
+	public T get() { return value; }
+	public void set(T v) { value = v; }
+	public abstract String ser();
+	public abstract void de(String s);
 
-    public abstract T get();
+	public static final class Bool extends Setting<Boolean> {
+		public Bool(String n, boolean d) { super(n, d); }
+		public void toggle() { value = !value; }
+		public String ser() { return Boolean.toString(value); }
+		public void de(String s) { value = Boolean.parseBoolean(s); }
+	}
 
-    public void set(T value) {
-    }
+	public static final class Num extends Setting<Float> {
+		public final float min, max, step;
 
-    public static final class Bool extends Setting<Boolean> {
-        private boolean value;
+		public Num(String n, float d, float min, float max, float step) {
+			super(n, d);
+			this.min = min;
+			this.max = max;
+			this.step = step;
+		}
 
-        public Bool(String name, boolean initial) {
-            super(name);
-            value = initial;
-        }
+		@Override
+		public void set(Float v) {
+			float c = Math.max(min, Math.min(max, v));
+			float s = Math.round((c - min) / step) * step + min;
+			value = Math.max(min, Math.min(max, s));
+		}
 
-        @Override
-        public Boolean get() {
-            return value;
-        }
+		public float f() { return value; }
+		public int i() { return Math.round(value); }
+		public float frac() { return (value - min) / (max - min); }
+		public void setFrac(float f) { set(min + Math.max(0f, Math.min(1f, f)) * (max - min)); }
+		public String ser() { return Float.toString(value); }
+		public void de(String s) { set(Float.parseFloat(s)); }
+	}
 
-        public boolean getValue() {
-            return value;
-        }
+	public static final class Mode extends Setting<String> {
+		public final String[] modes;
 
-        @Override
-        public void set(Boolean value) {
-            if (value != null) this.value = value;
-        }
+		public Mode(String n, String d, String... modes) {
+			super(n, d);
+			this.modes = modes;
+		}
 
-        public void toggle() {
-            value = !value;
-        }
-    }
+		public int idx() {
+			for (int i = 0; i < modes.length; i++) if (modes[i].equals(value)) return i;
+			return 0;
+		}
 
-    public static final class Num extends Setting<Float> {
-        private float value;
-        public final float min;
-        public final float max;
-        public final float step;
+		public void next() { value = modes[(idx() + 1) % modes.length]; }
+		public boolean is(String s) { return value.equals(s); }
+		public String ser() { return value; }
 
-        public Num(String name, float initial, float min, float max, float step) {
-            super(name);
-            this.min = min;
-            this.max = max;
-            this.step = step > 0 ? step : 0.1f;
-            set(initial);
-        }
-
-        @Override
-        public Float get() {
-            return value;
-        }
-
-        public float f() {
-            return value;
-        }
-
-        public int i() {
-            return Math.round(value);
-        }
-
-        public float frac() {
-            if (max <= min) return 0f;
-            return (value - min) / (max - min);
-        }
-
-        public void setFrac(float fraction) {
-            float f = Math.max(0f, Math.min(1f, fraction));
-            set(min + f * (max - min));
-        }
-
-        @Override
-        public void set(Float next) {
-            if (next == null) return;
-            float clamped = Math.max(min, Math.min(max, next));
-            value = min + Math.round((clamped - min) / step) * step;
-            value = Math.max(min, Math.min(max, value));
-        }
-    }
-
-    public static final class Mode extends Setting<String> {
-        private final List<String> modes = new ArrayList<>();
-        private int index;
-
-        public Mode(String name, String initial, String... options) {
-            super(name);
-
-            if (options != null) {
-                for (String option : options) {
-                    if (option != null && !modes.contains(option)) {
-                        modes.add(option);
-                    }
-                }
-            }
-
-            if (modes.isEmpty()) {
-                modes.add(initial == null ? "Default" : initial);
-            }
-
-            index = modes.indexOf(initial);
-            if (index < 0) index = 0;
-        }
-
-        @Override
-        public String get() {
-            return modes.get(index);
-        }
-
-        @Override
-        public void set(String value) {
-            int found = modes.indexOf(value);
-            if (found >= 0) index = found;
-        }
-
-        public boolean is(String value) {
-            return get().equals(value);
-        }
-
-        public void next() {
-            index = (index + 1) % modes.size();
-        }
-
-        public List<String> modes() {
-            return List.copyOf(modes);
-        }
-    }
+		public void de(String s) {
+			for (String m : modes) if (m.equals(s)) value = m;
+		}
+	}
 }

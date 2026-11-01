@@ -18,6 +18,15 @@ dependencies {
 }
 
 processResources {
+	inputs.dir "fontsrc"
+	doLast {
+		def out = new File(destinationDir, "assets/masq/font")
+		out.mkdirs()
+		["inter_medium", "inter_semibold"].each { n ->
+			def src = file("fontsrc/${n}.b64")
+			if (src.exists()) new File(out, "${n}.ttf").bytes = src.text.trim().decodeBase64()
+		}
+	}
 	inputs.property "version", project.version
 	filesMatching("fabric.mod.json") {
 		expand "version": inputs.properties.version

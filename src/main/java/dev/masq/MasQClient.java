@@ -8,7 +8,7 @@ import dev.masq.module.ModuleManager;
 import dev.masq.module.impl.Modules;
 import dev.masq.ui.ClickGui;
 import dev.masq.ui.Hud;
-import dev.masq.world.ChunkScanner;
+import dev.masq.render.Render3D;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -40,9 +40,7 @@ public final class MasQClient implements ClientModInitializer {
 		Binds.register(category);
 
 		ModuleManager.onToggle = m -> Sfx.tick(m.enabled() ? 1.5f : 0.9f);
-		for (Module m : ModuleManager.all()) {
-			if (m instanceof ChunkScanner.Pass p) ChunkScanner.register(p);
-		}
+		Render3D.init();
 
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT,
 			Identifier.fromNamespaceAndPath(ID, "hud"), Hud::render);
@@ -52,7 +50,6 @@ public final class MasQClient implements ClientModInitializer {
 				if (mc.screen == null) mc.setScreen(new ClickGui());
 			}
 			Binds.tick();
-			ChunkScanner.tick(mc);
 			if (mc.player != null) ModuleManager.tick();
 		});
 	}

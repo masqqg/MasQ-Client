@@ -10,6 +10,8 @@
   "key.masq.mod.fullbright": "Toggle Fullbright",
   "key.masq.mod.esp": "Toggle ESP",
   "key.masq.mod.antiafk": "Toggle AntiAFK",
+  "key.masq.mod.freecam": "Toggle Freecam",
+  "key.masq.mod.freelook": "Toggle FreeLook",
   "key.masq.mod.chunkhunter": "Toggle ChunkHunter",
   "key.masq.mod.clearrender": "Toggle ClearRender"
 }

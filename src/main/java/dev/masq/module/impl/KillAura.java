@@ -23,6 +23,9 @@ public final class KillAura extends Module {
 	private final Setting.Bool cooldown = add(new Setting.Bool("Cooldown", true));
 	private final Setting.Mode sort = add(new Setting.Mode("Sort", "Distance", "Distance", "Health"));
 
+	public static LivingEntity target;
+	public static long targetTime;
+
 	public KillAura() { super("KillAura", "Auto attack nearby targets", Category.COMBAT); }
 
 	private boolean valid(LocalPlayer p, Entity e) {
@@ -61,6 +64,8 @@ public final class KillAura extends Module {
 			p.setYRot((float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
 			p.setXRot((float) -Math.toDegrees(Math.atan2(dy, h)));
 		}
+		target = (LivingEntity) best;
+		targetTime = System.currentTimeMillis();
 		mc.gameMode.attack(p, best);
 		p.swing(InteractionHand.MAIN_HAND);
 	}

@@ -13,6 +13,7 @@ import dev.masq.module.ModuleManager;
 import dev.masq.module.Setting;
 import dev.masq.render.Colors;
 import dev.masq.render.Draw;
+import dev.masq.render.Fx;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -90,8 +91,8 @@ public final class ClickGui extends Screen {
 	private int[] tabRect(int i) {
 		Category[] cs = Category.values();
 		int x = px() + 16;
-		for (int j = 0; j < i; j++) x += font.width(cs[j].label()) + 16 + 4;
-		return new int[] { x, font.width(cs[i].label()) + 16 };
+		for (int j = 0; j < i; j++) x += Fx.width(cs[j].label()) + 16 + 4;
+		return new int[] { x, Fx.width(cs[i].label()) + 16 };
 	}
 
 	private static boolean inside(double x, double y, double rx, double ry, double rw, double rh) {
@@ -197,22 +198,22 @@ public final class ClickGui extends Screen {
 		Draw.roundRect(g, x, y, W, H, 14, c(Colors.a(Colors.INK, 0.95f)));
 
 		Draw.logo(g, x + 28, y + 26, 10, am);
-		g.drawString(font, "MasQ", x + 46, y + 21, c(Colors.TEXT), false);
+		Fx.text(g, "MasQ", x + 46, y + 21, c(Colors.TEXT), false);
 		String v = "1.21.11";
-		g.drawString(font, v, x + W - 16 - font.width(v), y + 21, c(Colors.DIM), false);
+		Fx.text(g, v, x + W - 16 - Fx.width(v), y + 21, c(Colors.DIM), false);
 
 		Draw.roundRect(g, tabX.value(), y + 42, tabW.value(), TH, TH / 2f, c(Colors.a(Colors.LILAC, 0.22f)));
 		Category[] cs = Category.values();
 		for (int i = 0; i < cs.length; i++) {
 			int[] r = tabRect(i);
-			g.drawString(font, cs[i].label(), r[0] + 8, y + 42 + (TH - 9) / 2 + 1, c(cs[i] == cat ? Colors.TEXT : Colors.DIM), false);
+			Fx.text(g, cs[i].label(), r[0] + 8, y + 42 + (TH - 9) / 2 + 1, c(cs[i] == cat ? Colors.TEXT : Colors.DIM), false);
 		}
 
 		int rx0 = x + 16, rw = W - 32;
 		g.enableScissor(x + 8, top() - 2, x + W - 8, top() + areaH());
 		if (cur.isEmpty()) {
 			String e = "No modules yet";
-			g.drawString(font, e, x + (W - font.width(e)) / 2, top() + 8, c(Colors.DIM), false);
+			Fx.text(g, e, x + (W - Fx.width(e)) / 2, top() + 8, c(Colors.DIM), false);
 		}
 		for (int i = 0; i < cur.size(); i++) {
 			Row r = cur.get(i);
@@ -229,7 +230,7 @@ public final class ClickGui extends Screen {
 
 		String hint = listening != null ? "Press a key to bind  (Esc cancel, Del clear)"
 			: "LMB toggle   RMB settings   MMB bind   Esc close";
-		g.drawString(font, hint, x + 16, y + H - 20, c(Colors.a(listening != null ? Colors.EMBER : Colors.DIM, 0.8f)), false);
+		Fx.text(g, hint, x + 16, y + H - 20, c(Colors.a(listening != null ? Colors.EMBER : Colors.DIM, 0.8f)), false);
 	}
 
 	private void paintRow(GuiGraphics g, Row r, int i, float o, int rx0, int rw) {
@@ -247,10 +248,10 @@ public final class ClickGui extends Screen {
 		if (f > 0.01f) Draw.roundRect(g, rx, ry, Math.max(RH, rw * f), RH, RH / 2f, c(Colors.a(Colors.EMBER, 0.92f * t)));
 
 		int ty = Math.round(ry) + (RH - 9) / 2 + 1;
-		g.drawString(font, m.name(), Math.round(rx) + 12, ty, c(Colors.a(Colors.TEXT, t)), false);
+		Fx.text(g, m.name(), Math.round(rx) + 12, ty, c(Colors.a(Colors.TEXT, t)), false);
 		String key = Binds.label(m);
 		String right = (key.isEmpty() ? "" : "[" + key + "]  ") + (m.enabled() ? "ON" : "OFF");
-		g.drawString(font, right, Math.round(rx + rw) - 12 - font.width(right), ty,
+		Fx.text(g, right, Math.round(rx + rw) - 12 - Fx.width(right), ty,
 			c(Colors.a(m.enabled() ? Colors.TEXT : Colors.DIM, t)), false);
 
 		if (e <= 0.05f) return;
@@ -261,30 +262,30 @@ public final class ClickGui extends Screen {
 			if (sy + SR - 1 > ry + r.h) break;
 			int ly = Math.round(sy) + 5;
 			if (j == ss.size()) {
-				g.drawString(font, "Bind", Math.round(sx), ly, c(Colors.a(Colors.TEXT, a)), false);
+				Fx.text(g, "Bind", Math.round(sx), ly, c(Colors.a(Colors.TEXT, a)), false);
 				String kv = listening == m ? "press a key..." : key.isEmpty() ? "None" : key;
-				g.drawString(font, kv, Math.round(sx + sw) - font.width(kv), ly,
+				Fx.text(g, kv, Math.round(sx + sw) - Fx.width(kv), ly,
 					c(Colors.a(listening == m ? Colors.EMBER : Colors.LILAC, a)), false);
 				break;
 			}
 			Setting<?> s = ss.get(j);
 			if (s instanceof Setting.Bool b) {
-				g.drawString(font, b.name(), Math.round(sx), ly, c(Colors.a(Colors.TEXT, a)), false);
+				Fx.text(g, b.name(), Math.round(sx), ly, c(Colors.a(Colors.TEXT, a)), false);
 				float k = Easing.clamp01(anim(b).value());
 				Draw.roundRect(g, sx + sw - 22, sy + 4, 22, 10, 5, c(Colors.a(Colors.mix(TRACK, Colors.EMBER, k), a)));
 				Draw.ring(g, Math.round(sx + sw - 22 + 5 + k * 12), Math.round(sy + 9), 4, 0, c(Colors.a(Colors.TEXT, a)));
 			} else if (s instanceof Setting.Num n) {
-				g.drawString(font, n.name(), Math.round(sx), Math.round(sy) + 1, c(Colors.a(Colors.TEXT, a)), false);
+				Fx.text(g, n.name(), Math.round(sx), Math.round(sy) + 1, c(Colors.a(Colors.TEXT, a)), false);
 				String val = fmt(n);
-				g.drawString(font, val, Math.round(sx + sw) - font.width(val), Math.round(sy) + 1, c(Colors.a(Colors.LILAC, a)), false);
+				Fx.text(g, val, Math.round(sx + sw) - Fx.width(val), Math.round(sy) + 1, c(Colors.a(Colors.LILAC, a)), false);
 				float fy = sy + SR - 6, fw = sw * Easing.clamp01(anim(n).value());
 				Draw.roundRect(g, sx, fy, sw, 3, 1.5f, c(Colors.a(TRACK, a)));
 				Draw.roundRect(g, sx, fy, Math.max(3f, fw), 3, 1.5f, c(Colors.a(Colors.EMBER, a)));
 				Draw.ring(g, Math.round(sx + fw), Math.round(fy) + 1, 3, 0, c(Colors.a(Colors.TEXT, a)));
 			} else if (s instanceof Setting.Mode md) {
-				g.drawString(font, md.name(), Math.round(sx), ly, c(Colors.a(Colors.TEXT, a)), false);
+				Fx.text(g, md.name(), Math.round(sx), ly, c(Colors.a(Colors.TEXT, a)), false);
 				String val = md.get();
-				g.drawString(font, val, Math.round(sx + sw) - font.width(val), ly, c(Colors.a(Colors.LILAC, a)), false);
+				Fx.text(g, val, Math.round(sx + sw) - Fx.width(val), ly, c(Colors.a(Colors.LILAC, a)), false);
 			}
 		}
 	}

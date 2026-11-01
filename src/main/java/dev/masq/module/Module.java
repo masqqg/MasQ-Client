@@ -41,6 +41,18 @@ public abstract class Module {
 	public void onTick() {}
 
 	public List<Setting<?>> settings() { return settings; }
+
+	public List<Setting<?>> visible() {
+		List<Setting<?>> out = new ArrayList<>();
+		for (Setting<?> s : settings) if (s.visible()) out.add(s);
+		return out;
+	}
+
+	/** Sohbete [MasQ] mesajı yazar. */
+	protected void info(String fmt, Object... args) {
+		var p = net.minecraft.client.Minecraft.getInstance().player;
+		if (p != null) p.displayClientMessage(net.minecraft.network.chat.Component.literal("\u00a7d[MasQ] \u00a7f" + String.format(fmt, args)), false);
+	}
 	public boolean enabled() { return on; }
 	public String name() { return name; }
 	public String desc() { return desc; }

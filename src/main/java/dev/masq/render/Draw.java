@@ -10,54 +10,64 @@ public final class Draw {
 		void paint(float x, float y, float alpha);
 	}
 
-	/** Kenarları yumuşatılmış yuvarlak dikdörtgen (r = h/2 ise hap). */
+	/** Fiziksel piksel çözünürlüğünde yumuşak yuvarlak dikdörtgen (r = h/2 ise hap). */
 	public static void roundRect(GuiGraphics g, float fx, float fy, float fw, float fh, float fr, int col) {
-		int x = Math.round(fx), y = Math.round(fy), w = Math.round(fw), h = Math.round(fh);
-		if (w <= 0 || h <= 0 || (col >>> 24) == 0) return;
-		int r = Math.max(0, Math.min(Math.round(fr), Math.min(w, h) / 2));
+		if ((col >>> 24) == 0 || fw <= 0 || fh <= 0) return;
+		float s = Fx.gs();
+		int x = Math.round(fx * s), y = Math.round(fy * s), w = Math.round(fw * s), h = Math.round(fh * s);
+		if (w <= 0 || h <= 0) return;
+		int r = Math.max(0, Math.min(Math.round(fr * s), Math.min(w, h) / 2));
+		var pose = g.pose();
+		pose.pushMatrix();
+		pose.scale(1f / s, 1f / s);
 		if (r == 0) {
 			g.fill(x, y, x + w, y + h, col);
-			return;
-		}
-		int mid = h - 2 * r;
-		if (mid > 0) g.fill(x, y + r, x + w, y + r + mid, col);
-		for (int i = 0; i < r; i++) {
-			float d = r - i - 0.5f;
-			float inset = r - (float) Math.sqrt(r * r - d * d);
-			int f = (int) inset;
-			int fringe = Colors.a(col, 1f - (inset - f));
-			int top = y + i, bot = y + h - 1 - i;
-			int l = x + f + 1, rr = x + w - f - 1;
-			if (l < rr) {
-				g.fill(l, top, rr, top + 1, col);
-				g.fill(l, bot, rr, bot + 1, col);
-			}
-			if (x + f < x + w - f - 1 || l <= rr) {
+		} else {
+			int mid = h - 2 * r;
+			if (mid > 0) g.fill(x, y + r, x + w, y + r + mid, col);
+			for (int i = 0; i < r; i++) {
+				float d = r - i - 0.5f;
+				float inset = r - (float) Math.sqrt(r * r - d * d);
+				int f = (int) inset;
+				int fringe = Colors.a(col, 1f - (inset - f));
+				int top = y + i, bot = y + h - 1 - i;
+				int l = x + f + 1, rr = x + w - f - 1;
+				if (l < rr) {
+					g.fill(l, top, rr, top + 1, col);
+					g.fill(l, bot, rr, bot + 1, col);
+				}
 				g.fill(x + f, top, x + f + 1, top + 1, fringe);
 				g.fill(rr, top, rr + 1, top + 1, fringe);
 				g.fill(x + f, bot, x + f + 1, bot + 1, fringe);
 				g.fill(rr, bot, rr + 1, bot + 1, fringe);
 			}
 		}
+		pose.popMatrix();
 	}
 
 	/** ri = 0 verilirse dolu daire. */
 	public static void ring(GuiGraphics g, int cx, int cy, int ro, int ri, int col) {
-		for (int dy = -ro; dy <= ro; dy++) {
-			int wo = (int) Math.round(Math.sqrt(ro * ro - dy * dy));
-			int y = cy + dy;
-			if (Math.abs(dy) < ri) {
-				int wi = (int) Math.round(Math.sqrt(ri * ri - dy * dy));
-				g.fill(cx - wo, y, cx - wi, y + 1, col);
-				g.fill(cx + wi, y, cx + wo, y + 1, col);
+		float s = Fx.gs();
+		int ox = Math.round(cx * s), oy = Math.round(cy * s), o = Math.round(ro * s), in = Math.round(ri * s);
+		var pose = g.pose();
+		pose.pushMatrix();
+		pose.scale(1f / s, 1f / s);
+		for (int dy = -o; dy <= o; dy++) {
+			int wo = (int) Math.round(Math.sqrt((double) o * o - (double) dy * dy));
+			int y = oy + dy;
+			if (Math.abs(dy) < in) {
+				int wi = (int) Math.round(Math.sqrt((double) in * in - (double) dy * dy));
+				g.fill(ox - wo, y, ox - wi, y + 1, col);
+				g.fill(ox + wi, y, ox + wo, y + 1, col);
 			} else {
-				g.fill(cx - wo, y, cx + wo, y + 1, col);
+				g.fill(ox - wo, y, ox + wo, y + 1, col);
 			}
 		}
+		pose.popMatrix();
 	}
 
 	/** Halka Q + maske gözü. */
-	public static void logo(GuiGraphics g, int cx, int cy, int r, float a) {
+	public static void logo(GuiGraphics g, float cx, float cy, float r, float a) {
 		Logo.draw(g, cx, cy, r, a);
 	}
 
